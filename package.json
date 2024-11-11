@@ -19,6 +19,7 @@
 		"discord-api-types": "^0.37.101",
 		"discord.js": "^14.16.3",
 		"mysql": "^2.18.1",
+		"node-docker-api": "^1.1.22",
 		"node-html-parser": "^6.1.11",
 		"rcon-client": "^4.2.5"
 	}
