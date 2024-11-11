@@ -4,7 +4,6 @@ const config = require(`${__dirname}/server/config/config.json`);
 logger.init(config);
 // const discordjs = require(`discord.js`);
 const { Client, GatewayIntentBits, Partials } = require(`discord.js`);
-const {Docker} = require('node-docker-api');
 
 const discordconfig = require(`${__dirname}/server/config/config.json`)[`discord`];
 const remoteconfig = require(`${__dirname}/server/config/config.json`)[`remotes`];
@@ -24,7 +23,7 @@ const myArgs = process.argv.slice(2);
 
 const msc = require(`./server/utils/MinecraftServerConnector.js`).connector;
 const permissionUtil = require(`./server/utils/permissionUtil.js`).perms;
-
+const dockerUtil = require(`./server/utils/dockerUtil.js`).docker;
 const settings = {
 	skipMemberFix: myArgs.includes("smf"),
 }
@@ -66,6 +65,7 @@ const scripts = {
 	utils: {
 		minecraftServerConnector: msc,
 		permissionUtil: permissionUtil,
+		docker: dockerUtil,
 	},
 	logger: logger,
 	settings: settings
@@ -108,6 +108,7 @@ const interactions = {
 	// initializing processes
 	await msc.init(discord.client, scripts);
 	await permissionUtil.init(discord.client, scripts);
+	await dockerUtil.init(discord.client, scripts);
 	// bot configuration processes
 	await slashcommander.init(discord.client, scripts, discord.token);
 	
@@ -117,8 +118,6 @@ const interactions = {
 	await operator.init(discord.client, scripts);
 	logger.info(`Startup Complete: ${util.prettyDate()}`);
 
-	const docker = new Docker();
-	let containers = await docker.container.list();
-	console.log(containers[0].data.Names);
+	
 	// add new members
 })();

@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc;
+var client, guild, query, util, self, msc, docker;
 
 module.exports = {
     name: `servers`,
@@ -15,6 +15,7 @@ module.exports = {
         query = scripts.sql.query;
         util = scripts.util;
         msc = scripts.utils.minecraftServerConnector;
+        docker = scripts.utils.docker;
         self = this;
     },
     execute: async (interaction, options, user, gameid, guild) => {
@@ -36,6 +37,10 @@ module.exports = {
 
                 if (i.modpackversion) {
                     desc+=`\nPack version: **${i.modpackversion}**`;
+                }
+
+                if (i[`docker-volume`]) {
+                    desc += `\nServer Status: ${(await docker.getContainer().then((container) => container.status()))}`;
                 }
                 
                 if (i.iconurl != null) {
