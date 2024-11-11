@@ -25,5 +25,7 @@ exports.docker = {
                 }
             }
         }
+        console.error(`Docker Container not found!`);
+        return null;
     }
 }
