@@ -19,8 +19,10 @@ exports.docker = {
     getContainer: async (containername) => {
         let containers = await docker.container.list();
         for (let c of containers) {
-            if (c.data.Names.incudes(containername)) {
-                return c;
+            for (let n of c.data.Names) {
+                if (m == containername) {
+                    return c;
+                }
             }
         }
     }
