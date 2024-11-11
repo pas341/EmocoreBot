@@ -118,11 +118,7 @@ const interactions = {
 	logger.info(`Startup Complete: ${util.prettyDate()}`);
 
 	const docker = new Docker();
-	docker.container.list()
-   // Inspect
-  .then(containers => containers[0].status())
-  .then(container => container.top())
-  .then(processes => console.log(processes))
-  .catch(error => console.log(error));
+	let containers = docker.container.list();
+	console.log(containers);
 	// add new members
 })();
