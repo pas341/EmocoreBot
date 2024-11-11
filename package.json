@@ -1,0 +1,25 @@
+{
+	"name": "emocore-bot",
+	"description": "Discord bot for Emocore",
+	"version": "1.0.1",
+	"main": "app.js",
+	"author": "Pas",
+	"license": "ISC",
+	"scripts": {
+		"config-install": "cp ./app/server/config/config.json.default ./app/server/config/config.json",
+		"run": "node ."
+	},
+	"nodemonConfig": {
+		"ignore": [
+			"data/*"
+		]
+	},
+	"dependencies": {
+		"@discordjs/rest": "^2.4.0",
+		"discord-api-types": "^0.37.101",
+		"discord.js": "^14.16.3",
+		"mysql": "^2.18.1",
+		"node-html-parser": "^6.1.11",
+		"rcon-client": "^4.2.5"
+	}
+}
