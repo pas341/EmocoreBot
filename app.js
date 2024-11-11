@@ -119,6 +119,6 @@ const interactions = {
 
 	const docker = new Docker();
 	let containers = await docker.container.list();
-	console.log(containers);
+	console.log(containers[0].data.Names);
 	// add new members
 })();
