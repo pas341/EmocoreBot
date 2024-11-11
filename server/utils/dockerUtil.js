@@ -17,6 +17,7 @@ exports.docker = {
         return containers;
     },
     getContainer: async (containername) => {
+        console.log(`Container: ${containername} requested!`);
         let containers = await docker.container.list();
         for (let c of containers) {
             console.log(c);
