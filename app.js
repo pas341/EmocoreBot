@@ -117,7 +117,7 @@ const interactions = {
 	await operator.init(discord.client, scripts);
 	logger.info(`Startup Complete: ${util.prettyDate()}`);
 
-	const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+	const docker = new Docker();
 	docker.container.list()
    // Inspect
   .then(containers => containers[0].status())
