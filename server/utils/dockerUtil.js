@@ -20,7 +20,7 @@ exports.docker = {
         let containers = await docker.container.list();
         for (let c of containers) {
             for (let n of c.data.Names) {
-                if (m == containername) {
+                if (n == containername) {
                     return c;
                 }
             }
