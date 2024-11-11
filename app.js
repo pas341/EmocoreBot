@@ -118,7 +118,7 @@ const interactions = {
 	logger.info(`Startup Complete: ${util.prettyDate()}`);
 
 	const docker = new Docker();
-	let containers = docker.container.list();
+	let containers = await docker.container.list();
 	console.log(containers);
 	// add new members
 })();
