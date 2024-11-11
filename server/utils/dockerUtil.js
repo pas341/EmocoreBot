@@ -20,11 +20,8 @@ exports.docker = {
         console.log(`Container: ${containername} requested!`);
         let containers = await docker.container.list();
         for (let c of containers) {
-            console.log(c);
-            for (let n of c.data.Names) {
-                if (n == containername) {
-                    return c;
-                }
+            if (c.data.Labels[`com.docker.compose.service`]) {
+                return c;
             }
         }
         console.error(`Docker Container not found!`);

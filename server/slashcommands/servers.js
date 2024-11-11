@@ -40,7 +40,7 @@ module.exports = {
                 }
 
                 if (i[`docker-volume`]) {
-                    desc += `\nServer Status: ${(await docker.getContainer()).status()}`;
+                    desc += `\nServer Status: ${(await docker.getContainer(i[`docker-volume`])).status()}`;
                 }
                 
                 if (i.iconurl != null) {
