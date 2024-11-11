@@ -50,6 +50,11 @@ module.exports = {
     },
     execute: async (interaction, options, user, gameid, guild) => {
         try {
+            if (!(await util.getDBUserByDiscordUser(query, user))) {
+                await self.sendFaultReply(interaction, `Account Issue`, `You have to register your minecraft account to perform this command in discord`);
+                return;
+            }
+
             if (await perms.hasPermission(user, `op`, options.server)) {
                 let connection = await msc.connect(await msc.getServer(servername = options.server));
                 let target = options.target ? options.target : (await util.getDBUserByDiscordUser(query, user)).mname;
