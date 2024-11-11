@@ -4,7 +4,7 @@ const config = require(`${__dirname}/server/config/config.json`);
 logger.init(config);
 // const discordjs = require(`discord.js`);
 const { Client, GatewayIntentBits, Partials } = require(`discord.js`);
-
+const {Docker} = require('node-docker-api');
 
 const discordconfig = require(`${__dirname}/server/config/config.json`)[`discord`];
 const remoteconfig = require(`${__dirname}/server/config/config.json`)[`remotes`];
@@ -116,6 +116,13 @@ const interactions = {
 	// initialize the event and command handlers
 	await operator.init(discord.client, scripts);
 	logger.info(`Startup Complete: ${util.prettyDate()}`);
-	
+
+	const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+	docker.container.list()
+   // Inspect
+  .then(containers => containers[0].status())
+  .then(container => container.top())
+  .then(processes => console.log(processes))
+  .catch(error => console.log(error));
 	// add new members
 })();
