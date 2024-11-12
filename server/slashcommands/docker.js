@@ -117,8 +117,8 @@ module.exports = {
                 await self.docker_restart(interaction, options, user);
                 return;
             } else if (subCommand == `debug`) {
-                console.log(self.debug);
-                await self.debug(interaction, options, user);
+                console.log(self.test);
+                await self.test(interaction, options, user);
                 return;
             } else {
                 await self.sendErrorReply(interaction, `Command not found please contact <@228573762864283649>`);
@@ -129,7 +129,7 @@ module.exports = {
             self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`);
         }
     },
-    debug: async (interaction, options, user) => {
+    test: async (interaction, options, user) => {
         if (await perms.hasPermission(user, `docker.start`, options.server)) {
             let serverinfo = await msc.getServer(servername = options.server);
             if (!serverinfo[`docker-volume`]) {
