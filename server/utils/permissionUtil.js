@@ -105,6 +105,29 @@ exports.perms = {
             });
         });
 
+        let pgroups = [];
+
+        let pgroupsDB = await new Promise((resolve) => {
+            query(`SELECT * FROM \`permission-groups\``, [], async (error, results, fields) => {
+                if (error) {
+                    console.error(error);
+                    resolve(null);
+                } else {
+                    resolve(results.length ? results : null);
+                }
+            });
+        });
+
+        let groupids = [];
+        for (let g of permissiongroups) {
+            groupids.push(g.groupid);
+        }
+
+        for (let g of pgroupsDB) {
+            if (groupids.includes(g.id)) {
+                pgroups.push(g);
+            }
+        }
 
 
         if (userperm) {
@@ -112,7 +135,8 @@ exports.perms = {
         }
 
         if (!found) {
-            for (let g of permissiongroups) {
+            for (let g of pgroups) {
+                console.log(g);
                 let sp = g.permissions.split(`,`);
                 if (sp.includes(p.id)) {
                     found = 1;
