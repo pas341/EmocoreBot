@@ -117,6 +117,7 @@ module.exports = {
                 await self.docker_restart(interaction, options, user);
                 return;
             } else if (subCommand == `debug`) {
+                console.log(self.debug);
                 await self.debug(interaction, options, user);
                 return;
             } else {
