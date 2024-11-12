@@ -95,7 +95,7 @@ exports.perms = {
         });
 
         let permissiongroups = await new Promise((resolve) => {
-            query(`SELECT * FROM \`minecraft-server-permission-groups\` WHERE \`serverid\` = ? AND \`playerid\``, [dbserver.id, dbuser.id], async (error, results, fields) => {
+            query(`SELECT * FROM \`minecraft-server-permission-groups\` WHERE \`serverid\` = ? AND \`playerid\` = ?`, [dbserver.id, dbuser.id], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
