@@ -118,32 +118,37 @@ exports.perms = {
             });
         });
 
-        let groupids = [];
-        for (let g of permissiongroups) {
-            groupids.push(g.groupid);
-        }
+        if (permissiongroups) {
 
-        for (let g of pgroupsDB) {
-            if (groupids.includes(g.id)) {
-                pgroups.push(g);
+            let groupids = [];
+            for (let g of permissiongroups) {
+                groupids.push(g.groupid);
             }
-        }
+            
+            for (let g of pgroupsDB) {
+                if (groupids.includes(g.id)) {
+                    pgroups.push(g);
+                }
+            }
 
-
-        if (userperm) {
-            found = 1;
-        }
-
-        if (!found) {
-            for (let g of pgroups) {
-                console.log(g);
-                let sp = g.permissions.split(`,`);
-                if (sp.includes(p.id)) {
-                    found = 1;
-                    break;
+            if (!found) {
+                for (let g of pgroups) {
+                    console.log(g);
+                    let sp = g.permissions.split(`,`);
+                    if (sp.includes(p.id)) {
+                        found = 1;
+                        break;
+                    }
                 }
             }
         }
+
+
+        if (userperm && !found) {
+            found = 1;
+        }
+
+        
 
         return found;
     }
