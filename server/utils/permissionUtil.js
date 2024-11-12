@@ -37,6 +37,8 @@ exports.perms = {
             console.log(`Server: ${server}`);
         }
 
+        let found = 0;
+
         if (!permsByKey[perm]) {
             console.error(`Permission not found: ${perm}`);
             return 0;
@@ -92,10 +94,33 @@ exports.perms = {
             });
         });
 
+        let permissiongroups = await new Promise((resolve) => {
+            query(`SELECT * FROM \`minecraft-server-permission-groups\` WHERE \`serverid\` = ? AND \`playerid\``, [dbserver.id, dbuser.id], async (error, results, fields) => {
+                if (error) {
+                    console.error(error);
+                    resolve(null);
+                } else {
+                    resolve(results.length ? results : null);
+                }
+            });
+        });
+
+
+
         if (userperm) {
-            return 1;
-        }else{
-            return 0;
+            found = 1;
         }
+
+        if (!found) {
+            for (let g of permissiongroups) {
+                let sp = g.permissions.split(`,`);
+                if (sp.includes(p.id)) {
+                    found = 1;
+                    break;
+                }
+            }
+        }
+
+        return found;
     }
 }
