@@ -7,7 +7,7 @@ module.exports = {
     min_uptime: 1000,
     // Delay between restart
     watch_delay: 5000,
-    ignore_watch: ["node_modules", "logs", "data", "git"],
+    ignore_watch: ["node_modules", "logs", "data", ".git/"],
     env_development: {
       "NODE_ENV": `development`,
     },
