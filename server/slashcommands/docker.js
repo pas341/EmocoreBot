@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc, docker;
+var client, guild, query, util, self, msc, docker, perms;
 
 module.exports = {
     name: `docker`,
@@ -56,6 +56,7 @@ module.exports = {
         guild = client.guilds.cache.find(g => g.name === scripts.guildname);
         msc = scripts.utils.minecraftServerConnector;
         docker = scripts.utils.docker;
+        perms = scripts.utils.permissionUtil;
         query = scripts.sql.query;
         util = scripts.util;
         self = this;
