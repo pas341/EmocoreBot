@@ -72,6 +72,15 @@ module.exports = {
             }
         }
     },
+    getServers: async () => {
+        let options = [];
+        let servers = await msc.getServerInfo();
+        for (let i of servers) {
+            let obj = {name: i.name, value: i.name};
+            options.push(obj);
+        }
+        return options;
+    },
     execute: async (interaction, options, user, gameid, guild) => {
         try {
 
