@@ -133,6 +133,7 @@ exports.perms = {
 
             if (!found) {
                 for (let g of pgroups) {
+                    console.log(`Required Permission ID: ${p.id}`);
                     console.log(g);
                     let sp = g.permissions.split(`,`);
                     if (sp.includes(p.id)) {
