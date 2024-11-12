@@ -128,7 +128,7 @@ module.exports = {
             self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`);
         }
     },
-    docker_start: async (interaction, options, user) => {
+    debug: async (interaction, options, user) => {
         if (await perms.hasPermission(user, `docker.start`, options.server)) {
             let serverinfo = await msc.getServer(servername = options.server);
             if (!serverinfo[`docker-volume`]) {
