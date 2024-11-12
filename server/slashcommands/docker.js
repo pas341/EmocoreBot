@@ -74,10 +74,13 @@ module.exports = {
 
             if (subCommand == `start`) {
                 await self.docker_start(interaction, options, user);
+                return;
             } else if (subCommand == `stop`) {
                 await self.docker_stop(interaction, options, user);
+                return;
             } else if (subCommand == `restart`) {
                 await self.docker_restart(interaction, options, user);
+                return;
             } else {
                 await self.sendErrorReply(interaction, `Command not found please contact <@228573762864283649>`);
             }
