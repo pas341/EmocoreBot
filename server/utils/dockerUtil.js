@@ -1,19 +1,19 @@
 var client, guild, query, util, self, docker;
-const {Docker} = require('node-docker-api');
+const { Docker } = require('node-docker-api');
 
-exports.docker = {
+exports.d = {
     init: async (c, scripts) => {
         client = c;
         guild = client.guilds.cache.find(g => g.name === scripts.guildname);
         query = scripts.sql.query;
         util = scripts.util;
-        self = this;
+        self = this.d;
 
         docker = new Docker();
     },
     getList: async () => {
         let containers = await docker.container.list();
-	    console.log();
+        console.log();
         return containers;
     },
     getContainer: async (containername) => {

@@ -23,7 +23,7 @@ const myArgs = process.argv.slice(2);
 
 const msc = require(`./server/utils/MinecraftServerConnector.js`).connector;
 const permissionUtil = require(`./server/utils/permissionUtil.js`).perms;
-const dockerUtil = require(`./server/utils/dockerUtil.js`).docker;
+const dockerUtil = require(`./server/utils/dockerUtil.js`).d;
 const settings = {
 	skipMemberFix: myArgs.includes("smf"),
 }
