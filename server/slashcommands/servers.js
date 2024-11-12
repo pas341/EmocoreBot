@@ -43,7 +43,7 @@ module.exports = {
                     let container = await docker.getContainer(i[`docker-volume`])
                     if (container) {
                         let status = await container.status();
-                        console.log(container);
+                        console.log(status);
                         desc += `\nServer Status: **${status.data.State.Status}**`;
                     }
                 }
