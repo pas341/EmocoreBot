@@ -4,10 +4,10 @@ module.exports = {
     script: "./app.js",
     watch: true,
     max_restarts: 5,
-    min_uptime: 500,
+    min_uptime: 1000,
     // Delay between restart
-    watch_delay: 1000,
-    ignore_watch: ["node_modules", "logs", "data"],
+    watch_delay: 5000,
+    ignore_watch: ["node_modules", "logs", "data", "git"],
     env_development: {
       "NODE_ENV": `development`,
     },
