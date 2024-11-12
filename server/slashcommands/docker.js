@@ -16,6 +16,7 @@ module.exports = {
                     description: `What is the name of the server you want to start`,
                     type: 3,
                     required: true,
+                    choices: null
                 }
             ],
             default_member_permissions: 1,
@@ -30,6 +31,7 @@ module.exports = {
                     description: `What is the name of the server you want to stop`,
                     type: 3,
                     required: true,
+                    choices: null
                 }
             ],
             default_member_permissions: 1,
@@ -44,6 +46,7 @@ module.exports = {
                     description: `What is the name of the server you want to restart`,
                     type: 3,
                     required: true,
+                    choices: null
                 }
             ],
             default_member_permissions: 1,
@@ -60,6 +63,14 @@ module.exports = {
         query = scripts.sql.query;
         util = scripts.util;
         self = this;
+
+        for (let option of this.options) {
+            for (let o of option) {
+                if (o.name == `server`) {
+                    o.choices = await this.getServers();
+                }
+            }
+        }
     },
     execute: async (interaction, options, user, gameid, guild) => {
         try {
@@ -103,12 +114,11 @@ module.exports = {
                 return;
             }
 
+            
             await container.start();
-
             let response = `Starting Minecraft Server: **${serverinfo.name}**`;
             let e = { title: `Docker`, description: response, color: util.color.accent};
             interaction.reply({ ephemeral: true, embeds: [e] });
-            await connection.end();
         }else{
             await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`);
             return;
@@ -126,13 +136,10 @@ module.exports = {
                 await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`);
                 return;
             }
-
             await container.stop();
-
             let response = `Stopping Minecraft Server: **${serverinfo.name}**`;
             let e = { title: `Docker`, description: response, color: util.color.accent};
             interaction.reply({ ephemeral: true, embeds: [e] });
-            await connection.end();
         }else{
             await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`);
             return;
@@ -150,13 +157,10 @@ module.exports = {
                 await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`);
                 return;
             }
-
             await container.restart();
-
             let response = `Restarting Minecraft Server: **${serverinfo.name}**`;
             let e = { title: `Docker`, description: response, color: util.color.accent};
             interaction.reply({ ephemeral: true, embeds: [e] });
-            await connection.end();
         }else{
             await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`);
             return;
