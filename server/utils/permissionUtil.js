@@ -136,6 +136,7 @@ exports.perms = {
                     console.log(`Required Permission ID: ${p.id}`);
                     console.log(g);
                     let sp = g.permissions.split(`,`);
+                    console.log(`Permission Found: ${sp.includes(p.id)}`);
                     if (sp.includes(p.id)) {
                         found = 1;
                         break;
