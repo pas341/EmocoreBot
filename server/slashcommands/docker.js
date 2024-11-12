@@ -65,7 +65,7 @@ module.exports = {
         self = this;
 
         for (let option of this.options) {
-            for (let o of option) {
+            for (let o of option.options) {
                 if (o.name == `server`) {
                     o.choices = await this.getServers();
                 }
