@@ -150,7 +150,7 @@ module.exports = {
                     console.error(error);
                     resolve(null);
                 } else {
-                    resolve(results.length ? results[0] : null);
+                    resolve(results.length ? results[0][`curseforge-api-key`] : null);
                 }
             });
         });
@@ -166,6 +166,7 @@ module.exports = {
             rport: rconport,
             platform: `AUTO_CURSEFORGE`,
             curseforgeconfig: curseforge,
+            rconpassword: util.cookieGenerator.lettersAndNumbers({ lowercase: true, uppercase: true, quantity: 32 }),
             cpus: cpus,
             lram: lram
         }
