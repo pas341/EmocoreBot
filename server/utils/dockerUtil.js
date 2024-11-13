@@ -115,7 +115,7 @@ exports.d = {
         }
 
         let rconPortBinding = `${dockerConfig.rport}/tcp`;
-
+        console.log(rconPortBinding);
         let container = await docker.container.create({
             Image: dockerConfig.image,
             ExposedPorts: {
