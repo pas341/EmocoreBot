@@ -19,7 +19,7 @@ exports.d = {
     },
     getContainer: async (containername) => {
         console.log(`Container: ${containername} requested!`);
-        let containers = await docker.container.list();
+        let containers = await docker.container.list({all: true});
         for (let c of containers) {
             if (c.data.Labels[`com.docker.compose.service`] == containername) {
                 return c;
