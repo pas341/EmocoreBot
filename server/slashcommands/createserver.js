@@ -18,13 +18,6 @@ module.exports = {
                     required: true,
                 },
                 {
-                    name: `domain`,
-                    description: `What is the domain used for the server`,
-                    type: 3,
-                    required: false,
-                    default: `emocore.no`
-                },
-                {
                     name: `iconurl`,
                     description: `A Url to an icon for the server`,
                     type: 3,
@@ -47,7 +40,13 @@ module.exports = {
                     description: `The minecraft version the modpack runs on`,
                     type: 3,
                     required: true,
-                }
+                },
+                {
+                    name: `domain`,
+                    description: `What is the domain used for the server`,
+                    type: 3,
+                    required: false,
+                },
             ],
             default_member_permissions: 0,
         },

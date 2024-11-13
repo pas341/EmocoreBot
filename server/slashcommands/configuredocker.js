@@ -61,6 +61,12 @@ module.exports = {
                     required: true,
                 },
                 {
+                    name: `cpus`,
+                    description: `What is the cpu configuration for this server`,
+                    type: 3,
+                    required: true,
+                },
+                {
                     name: `extra_args`,
                     description: `Extra server arguments`,
                     type: 3,
@@ -71,12 +77,6 @@ module.exports = {
                     description: `Extra jvm settings`,
                     type: 3,
                     required: false,
-                },
-                {
-                    name: `cpus`,
-                    description: `What is the cpu configuration for this server`,
-                    type: 3,
-                    required: true,
                 },
             ],
             default_member_permissions: 0,
@@ -130,6 +130,12 @@ module.exports = {
                     required: true,
                 },
                 {
+                    name: `cpus`,
+                    description: `What is the cpu configuration for this server`,
+                    type: 3,
+                    required: true,
+                },
+                {
                     name: `extra_args`,
                     description: `Extra server arguments`,
                     type: 3,
@@ -140,12 +146,6 @@ module.exports = {
                     description: `Extra jvm settings`,
                     type: 3,
                     required: false,
-                },
-                {
-                    name: `cpus`,
-                    description: `What is the cpu configuration for this server`,
-                    type: 3,
-                    required: true,
                 },
             ],
             default_member_permissions: 0,
