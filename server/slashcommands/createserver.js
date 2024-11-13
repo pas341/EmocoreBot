@@ -18,6 +18,13 @@ module.exports = {
                     required: true,
                 },
                 {
+                    name: `domain`,
+                    description: `What is the domain used for the server`,
+                    type: 3,
+                    required: false,
+                    default: `emocore.no`
+                },
+                {
                     name: `iconurl`,
                     description: `A Url to an icon for the server`,
                     type: 3,
@@ -121,13 +128,14 @@ module.exports = {
         let modpackurl = options.modpackurl;
         let modpackversion = options.modpackversion;
         let minecraftversion = options.minecraftversion;
+        let domain = options.domain ? options.domain : `emocore.no`;
 
         let disocordChannelId = channel.id;
         let channelCategoryId = channel.parentId;
 
         let serverID = await new Promise((resolve) => {
-            query(`INSERT INTO \`minecraft-servers\` (\`name\`, \`iconurl\`, \`modpackurl\`, \`modpackversion\`, \`mcversion\`, \`discordchannel\`, \`discordcat\`) VALUES (?, ?, ?, ?, ?, ?, ?)`
-                , [name, iconurl, modpackurl, modpackversion, minecraftversion, disocordChannelId, channelCategoryId], async (error, results, fields) => {
+            query(`INSERT INTO \`minecraft-servers\` (\`name\`, \`iconurl\`, \`modpackurl\`, \`modpackversion\`, \`mcversion\`, \`discordchannel\`, \`discordcat\`, \`domain\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+                , [name, iconurl, modpackurl, modpackversion, minecraftversion, disocordChannelId, channelCategoryId, domain], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);

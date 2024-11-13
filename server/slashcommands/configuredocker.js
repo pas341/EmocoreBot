@@ -61,6 +61,87 @@ module.exports = {
                     required: true,
                 },
                 {
+                    name: `extra_args`,
+                    description: `Extra server arguments`,
+                    type: 3,
+                    required: false,
+                },
+                {
+                    name: `jvm_options`,
+                    description: `Extra jvm settings`,
+                    type: 3,
+                    required: false,
+                },
+                {
+                    name: `cpus`,
+                    description: `What is the cpu configuration for this server`,
+                    type: 3,
+                    required: true,
+                },
+            ],
+            default_member_permissions: 0,
+        },
+        {
+            name: `custom`,
+            type: 1,
+            description: `Configure a server custom modpack docker container`,
+            options: [
+                {
+                    name: `serverid`,
+                    description: `What is the id of the server you want to configure`,
+                    type: 4,
+                    required: true,
+                },
+                {
+                    name: `image`,
+                    description: `What is the docker image you want to use for the server`,
+                    type: 3,
+                    required: true,
+                    choices: null,
+                },
+                {
+                    name: `container`,
+                    description: `What is the name of the container`,
+                    type: 3,
+                    required: true,
+                },
+                {
+                    name: `maxram`,
+                    description: `how much ram does the server need in GB`,
+                    type: 4,
+                    required: true,
+                },
+                {
+                    name: `port`,
+                    description: `What is the main port for this server`,
+                    type: 4,
+                    required: true,
+                },
+                {
+                    name: `rconport`,
+                    description: `What is the rcon port for this server`,
+                    type: 4,
+                    required: true,
+                },
+                {
+                    name: `customserver`,
+                    description: `What is the local filepath of the jarfile`,
+                    type: 3,
+                    required: true,
+                },
+                {
+                    name: `extra_args`,
+                    description: `Extra server arguments`,
+                    type: 3,
+                    required: false,
+                },
+                {
+                    name: `jvm_options`,
+                    description: `Extra jvm settings`,
+                    type: 3,
+                    required: false,
+                },
+                {
                     name: `cpus`,
                     description: `What is the cpu configuration for this server`,
                     type: 3,
@@ -123,6 +204,9 @@ module.exports = {
             if (subCommand == `curseforge`) {
                 await self.curseforge(interaction, options, user, channel);
                 return;
+            } else if (subCommand == `custom`) {
+                await self.custom(interaction, options, user);
+                return;
             } else {
                 await self.sendErrorReply(interaction, `Command not found please contact <@228573762864283649>`, defered = 1);
             }
@@ -130,6 +214,36 @@ module.exports = {
         } catch (e) {
             console.error(e);
             await self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`, defered = 1);
+        }
+    },
+    custom: async (interaction, options, user, channel) => {
+        if (!(await self.checkForServerConfig(options.serverid))) {
+            await self.sendErrorReply(interaction, `Invalid ServerID`, title = `Invalid Form Input`, defered = 1);
+            return;
+        }
+        let dockerConfig = await self.generateDockerConfigBase(interaction, options, user, channel);
+
+        let custom_server = options.customserver;
+
+        let configdata = {custom_server: custom_server};
+        
+        if (options.extra_args) {
+            configdata.extra_args = options.extra_args;
+        }
+        if (options.jvm_options) {
+            configdata.jvm_options = options.jvm_options;
+        }
+
+        dockerConfig.platform = `CUSTOM`;
+        dockerConfig.configdata = JSON.stringify(configdata);
+
+        let insertData = await self.insertDockerConfigInDB(interaction, options, user, channel, dockerConfig);
+        if (insertData.code != 0) {
+            await self.sendErrorReply(interaction, `${insertData.error}.\nPlease contact <@228573762864283649>`, defered = 1);
+            return;
+        }else{
+            await self.sendReply(interaction, `Docker Creator`, `Docker Configuration completed`, defered = 1);
+            return;
         }
     },
     curseforge: async (interaction, options, user, channel) => {
@@ -153,9 +267,19 @@ module.exports = {
         });
 
         let curseforge = {api_key: cf_api_key, slug: cfslug, file_id: fileid};
+
+        let configdata = {};
+        
+        if (options.extra_args) {
+            configdata.extra_args = options.extra_args;
+        }
+        if (options.jvm_options) {
+            configdata.jvm_options = options.jvm_options;
+        }
+
         dockerConfig.platform = `AUTO_CURSEFORGE`;
         dockerConfig.curseforgeconfig = JSON.stringify(curseforge);
-
+        dockerConfig.configdata = JSON.stringify(configdata);
         let insertData = await self.insertDockerConfigInDB(interaction, options, user, channel, dockerConfig);
         if (insertData.code != 0) {
             await self.sendErrorReply(interaction, `${insertData.error}.\nPlease contact <@228573762864283649>`, defered = 1);
