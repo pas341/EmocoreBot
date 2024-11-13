@@ -91,6 +91,10 @@ exports.perms = {
             });
         });
 
+        if (dbuser.admin) {
+            return 1;
+        }
+
         if (!dbuser) {
             console.error(`User not found in DB by discordId: ${user.id}`);
             return 0;
