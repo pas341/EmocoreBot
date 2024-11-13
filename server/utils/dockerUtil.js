@@ -133,6 +133,9 @@ exports.d = {
             if (configdata.jvm_options) {
                 ENV.push(`JVM_OPTS=${configdata.jvm_options}`);
             }
+            if (configdata.server_port) {
+                ENV.push(`SERVER_PORT=${configdata.server_port}`);
+            }
         }
 
         let expPorts = {};
