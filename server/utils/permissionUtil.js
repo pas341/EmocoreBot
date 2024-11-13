@@ -63,6 +63,19 @@ exports.perms = {
         });
 
         if (!dbserver) {
+            dbserver = await new Promise((resolve) => {
+                query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ?`, [server], async (error, results, fields) => {
+                    if (error) {
+                        console.error(error);
+                        resolve(null);
+                    } else {
+                        resolve(results.length ? results[0] : null);
+                    }
+                });
+            });
+        }
+
+        if (!dbserver) {
             console.error(`Server not found! server: ${server}`);
             return 0;
         }
@@ -148,9 +161,6 @@ exports.perms = {
         if (userperm && !found) {
             found = 1;
         }
-
-        
-
         return found;
-    }
+    },
 }

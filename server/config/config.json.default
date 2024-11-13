@@ -9,5 +9,8 @@
     "database_port": "",
     "database_user": "",
     "database_pass": ""
+  },
+  "server": {
+    "serverid": -1
   }
 }

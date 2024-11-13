@@ -26,8 +26,11 @@ module.exports = {
             let embeds = [];
 
             for (let i of servers) {
+                console.log(i);
                 let e = {title: i.name};
-                let desc = `Address: **${i.domain}:${i.extport}**`;
+                let desc = ``;
+                let serverPort = i.dockerConfig ? i.dockerConfig.esport : i.extport;
+                desc += `Address: **${i.domain}:${serverPort}**`;
                 if (i.mcversion) {
                     desc+=`\nMinecraft Version: **${i.mcversion}**`;
                 }
@@ -39,8 +42,8 @@ module.exports = {
                     desc+=`\nPack version: **${i.modpackversion}**`;
                 }
 
-                if (i[`docker-volume`]) {
-                    let container = await docker.getContainer(i[`docker-volume`]);
+                if (i.dockerConfig) {
+                    let container = await docker.getContainer(i.dockerConfig.containername);
                     if (container) {
                         let status = await container.status();
                         //console.log(status.data.Config);

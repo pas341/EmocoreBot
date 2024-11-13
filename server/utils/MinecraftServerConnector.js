@@ -22,6 +22,25 @@ exports.connector = {
                 }
             });
         });
+
+
+        for (let s of servers) {
+            let dockerinfo = await new Promise((resolve) => {
+                query(`SELECT * FROM \`minecraft-server-docker-config\` WHERE \`serverid\` = ?`, [s.id], async (error, results, fields) => {
+                    if (error) {
+                        console.error(error);
+                        resolve(null);
+                    } else {
+                        resolve(results.length ? results[0] : null);
+                    }
+                });
+            });
+
+            if (dockerinfo) {
+                s.dockerConfig = dockerinfo;
+            }
+        }
+
         return servers;
     },
     getServer: async (sinfo) => {
@@ -48,6 +67,22 @@ exports.connector = {
             });
         }
 
+        if (server) {
+            let dockerinfo = await new Promise((resolve) => {
+                query(`SELECT * FROM \`minecraft-server-docker-config\` WHERE \`serverid\` = ?`, [server.id], async (error, results, fields) => {
+                    if (error) {
+                        console.error(error);
+                        resolve(null);
+                    } else {
+                        resolve(results.length ? results[0] : null);
+                    }
+                });
+            });
+            if (dockerinfo) {
+                server.dockerConfig = dockerinfo;
+            }
+        }
+
         return server;
     },
     getServerByVCCategory: async (categoryId) => {
@@ -71,9 +106,9 @@ exports.connector = {
             return;
         }
 
-        let rconport = serverinfo.rconport;
+        let rconport = serverinfo.dockerConfig ? serverinfo.dockerConfig.rport : serverinfo.rconport;
+        let rconpassword = serverinfo.dockerConfig ? serverinfo.dockerConfig.rconpassword : serverinfo.rconpassword;
         let address = serverinfo.domain;
-        let rconpassword = serverinfo.rconpassword;
 
 
         let connection = await Rcon.connect({ host: address, port: rconport, password: rconpassword });

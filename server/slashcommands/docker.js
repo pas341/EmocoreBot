@@ -76,16 +76,16 @@ module.exports = {
         let options = [];
         let servers = await msc.getServerInfo();
         for (let i of servers) {
-            let obj = { name: i.name, value: i.name };
+            let obj = { name: i.name, value: ""+i.id };
             options.push(obj);
         }
         return options;
     },
     execute: async (interaction, options, user, gameid, guild) => {
         try {
-
+            await interaction.deferReply({ ephemeral: true });
             if (!(await util.getDBUserByDiscordUser(query, user))) {
-                await self.sendFaultReply(interaction, `Account Issue`, `You have to register your minecraft account to perform this command in discord`);
+                await self.sendFaultReply(interaction, `Account Issue`, `You have to register your minecraft account to perform this command in discord`, defered = 1);
                 return;
             }
 
@@ -102,32 +102,36 @@ module.exports = {
                 await self.docker_restart(interaction, options, user);
                 return;
             } else {
-                await self.sendErrorReply(interaction, `Command not found please contact <@228573762864283649>`);
+                await self.sendErrorReply(interaction, `Command not found please contact <@228573762864283649>`, defered = 1);
             }
 
         } catch (e) {
             console.error(e);
-            self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`);
+            await self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`, defered = 1);
         }
     },
     docker_start: async (interaction, options, user) => {
         if (await perms.hasPermission(user, `docker.start`, options.server)) {
             let serverinfo = await msc.getServer(servername = options.server);
-            if (!serverinfo[`docker-volume`]) {
+            if (!serverinfo.dockerConfig) {
                 await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `docker container name is not set in DB!`);
                 return;
             }
-            let container = await docker.getContainer(serverinfo[`docker-volume`]);
-            if (!container) {
-                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`);
+
+            let start_event = await docker.createContainer(serverinfo.dockerConfig.containername, options.server);
+            if (start_event.code != 0) {
+                console.error(`Docker container failed to start errorcode: ${start_event.code}`);
+                if (serverinfo.iconurl) {
+                    await self.sendErrorReply(interaction, title = start_event.error,`Error durring container startup`, defered = 1, icon = serverinfo.iconurl);
+                }else{
+                    await self.sendErrorReply(interaction, title = start_event.error,`Error durring container startup`, defered = 1);
+                }
                 return;
+            }else{
+                let response = `Starting Minecraft Server: **${serverinfo.name}**`;
+                let e = { title: `Docker`, description: response, color: util.color.accent };
+                interaction.followUp({ ephemeral: true, embeds: [e] });
             }
-
-
-            await container.start();
-            let response = `Starting Minecraft Server: **${serverinfo.name}**`;
-            let e = { title: `Docker`, description: response, color: util.color.accent };
-            interaction.reply({ ephemeral: true, embeds: [e] });
         } else {
             await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`);
             return;
@@ -136,47 +140,53 @@ module.exports = {
     docker_stop: async (interaction, options, user) => {
         if (await perms.hasPermission(user, `docker.stop`, options.server)) {
             let serverinfo = await msc.getServer(servername = options.server);
-            if (!serverinfo[`docker-volume`]) {
-                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `docker container name is not set in DB!`);
+            if (!serverinfo.dockerConfig) {
+                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `docker container name is not set in DB!`, defered = 1);
                 return;
             }
-            let container = await docker.getContainer(serverinfo[`docker-volume`]);
+            let container = await docker.getContainer(serverinfo.dockerConfig.containername, options.server);
             if (!container) {
-                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`);
+                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`, defered = 1);
                 return;
             }
+            await interaction.followUp({embeds: [{title: `Command Status`, description: `Server shutdown started`, color: util.color.accent}]});
             await container.stop();
+            await container.delete();
             let response = `Stopping Minecraft Server: **${serverinfo.name}**`;
             let e = { title: `Docker`, description: response, color: util.color.accent };
-            interaction.reply({ ephemeral: true, embeds: [e] });
+            interaction.followUp({ ephemeral: true, embeds: [e] });
         } else {
-            await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`);
+            await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`, defered = 1);
             return;
         }
     },
     docker_restart: async (interaction, options, user) => {
         if (await perms.hasPermission(user, `docker.restart`, options.server)) {
             let serverinfo = await msc.getServer(servername = options.server);
-            if (!serverinfo[`docker-volume`]) {
-                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `docker container name is not set in DB!`);
+            if (!serverinfo.dockerConfig) {
+                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `docker container name is not set in DB!`, defered = 1);
                 return;
             }
-            let container = await docker.getContainer(serverinfo[`docker-volume`]);
+
+            let container = await docker.getContainer(serverinfo.dockerConfig.containername);
             if (!container) {
-                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`);
+                await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`, defered = 1);
                 return;
             }
             await container.restart();
             let response = `Restarting Minecraft Server: **${serverinfo.name}**`;
             let e = { title: `Docker`, description: response, color: util.color.accent };
-            interaction.reply({ ephemeral: true, embeds: [e] });
+            interaction.followUp({ ephemeral: true, embeds: [e] });
         } else {
-            await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`);
+            await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`, defered = 1);
             return;
         }
     },
-    sendErrorReply: async (interaction, error, title = `Internal Error`, defered = 0) => {
+    sendErrorReply: async (interaction, error, title = `Internal Error`, defered = 0, icon = null) => {
         let e = { title: title, description: error, color: util.color.error };
+        if (icon != null) {
+            e.thumbnail = {url: icon};
+        }
         if (defered) {
             await interaction.followUp({ ephemeral: true, embeds: [e] });
         } else {

@@ -68,7 +68,8 @@ const scripts = {
 		docker: dockerUtil,
 	},
 	logger: logger,
-	settings: settings
+	settings: settings,
+	config: config
 };
 
 
