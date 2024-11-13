@@ -114,8 +114,6 @@ exports.d = {
             ENV.push(`CF_FILE_ID=${cfconfig.file_id}`);
         }
 
-        let rconPortBinding = `${dockerConfig.rport}/tcp`;
-        console.log(rconPortBinding);
         let container = await docker.container.create({
             Image: dockerConfig.image,
             ExposedPorts: {
@@ -127,11 +125,10 @@ exports.d = {
             AttachStderr: true,
             name: dockerConfig.containername,
             Env: ENV,
-            ExposedPorts: { rconPortBinding: {} },
             HostConfig: {
                 Binds: [`${serverConfigurationDB[`docker-container-base-location`]}/${dockerConfig.containername}:/data`,],
                 PortBindings: {
-                    "25575/tcp": [{
+                    "25577/tcp": [{
                         "HostIp": "",
                         "HostPort": ""+dockerConfig.rport
                     }],
