@@ -114,6 +114,27 @@ exports.d = {
             ENV.push(`CF_FILE_ID=${cfconfig.file_id}`);
         }
 
+        if (dockerConfig.platform==`CUSTOM`) {
+            let configdata = dockerConfig.configdata;
+            if (!configdata) {
+                console.error(`Docker config: configdata is required to use server type custom`);
+                return {code: 4, error: `Docker config: configdata is required to use server type custom`};
+            }
+            ENV.push(`TYPE=CUSTOM`);
+            ENV.push(`CUSTOM_SERVER=${configdata.custom_server}`);
+            
+        }
+
+        if (dockerConfig.configdata) {
+            let configdata = dockerConfig.configdata;
+            if (configdata.extra_args) {
+                ENV.push(`EXTRA_ARGS=${configdata.extra_args}`);
+            }
+            if (configdata.jvm_options) {
+                ENV.push(`JVM_OPTS=${configdata.jvm_options}`);
+            }
+        }
+
         let expPorts = {};
         expPorts["25575/tcp"] = {};
         expPorts["25565/tcp"] = {};
