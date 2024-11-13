@@ -13,7 +13,7 @@ exports.connector = {
     },
     getServerInfo: async () => {
         let servers = await new Promise((resolve) => {
-            query(`SELECT * FROM \`minecraft-servers\` INNER JOIN \`minecraft-server-docker-config\` ON \`minecraft-servers\`.id=\`minecraft-server-docker-config\`.serverid ORDER BY \`esport\``, [], async (error, results, fields) => {
+            query(`SELECT * FROM \`minecraft-servers\` ORDER BY \`extport\``, [], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
