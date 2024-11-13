@@ -133,17 +133,14 @@ module.exports = {
         }
     },
     curseforge: async (interaction, options, user, channel) => {
-        let serverid = options.serverid;
-        let containername = options.container;
-        let image = options.image;
-        let maxram = options.maxram;
-        let port = options.port;
-        let rconport = options.rconport;
-        let cfslug = options.cfslug;
-        let fileid = options.fileid;
-        let cpus = options.cpus;
-        let lram = options.maxram + 1;
+        if (!(await self.checkForServerConfig(options.serverid))) {
+            await self.sendErrorReply(interaction, `Invalid ServerID`, title = `Invalid Form Input`, defered = 1);
+            return;
+        }
+        let dockerConfig = await self.generateDockerConfigBase(interaction, options, user, channel);
 
+        let cfslug = options.cfslug; // Curseforge only
+        let fileid = options.fileid; // Curseforge only
         let cf_api_key = await new Promise((resolve) => {
             query(`SELECT * FROM \`server-config\` WHERE \`id\` = ?`, [config.server.serverid], async (error, results, fields) => {
                 if (error) {
@@ -156,24 +153,36 @@ module.exports = {
         });
 
         let curseforge = {api_key: cf_api_key, slug: cfslug, file_id: fileid};
+        dockerConfig.platform = `AUTO_CURSEFORGE`;
+        dockerConfig.curseforgeconfig = JSON.stringify(curseforge);
 
-        let obj = {
-            serverid: serverid,
-            image: image,
-            containername: containername,
-            mxram: maxram,
-            esport: port,
-            rport: rconport,
-            platform: `AUTO_CURSEFORGE`,
-            curseforgeconfig: JSON.stringify(curseforge),
-            rconpassword: util.cookieGenerator.lettersAndNumbers({ lowercase: true, uppercase: true, quantity: 32 }),
-            cpus: cpus,
-            lram: lram
+        let insertData = await self.insertDockerConfigInDB(interaction, options, user, channel, dockerConfig);
+        if (insertData.code != 0) {
+            await self.sendErrorReply(interaction, `${insertData.error}.\nPlease contact <@228573762864283649>`, defered = 1);
+            return;
+        }else{
+            await self.sendReply(interaction, `Docker Creator`, `Docker Configuration completed`, defered = 1);
+            return;
         }
+    },
+    checkForServerConfig: async (id) => {
+        let dbserver = await new Promise((resolve) => {
+            query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ?`, [id], async (error, results, fields) => {
+                if (error) {
+                    console.error(error);
+                    resolve(null);
+                } else {
+                    resolve(results.length ? results[0] : null);
+                }
+            });
+        });
 
+        return dbserver != null;
+    },
+    insertDockerConfigInDB: async (interaction, options, user, channel, dockerConfig) => {
         let serverID = await new Promise((resolve) => {
             query(`INSERT INTO \`minecraft-server-docker-config\` SET ?`
-                , [obj], async (error, results, fields) => {
+                , [dockerConfig], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
@@ -183,7 +192,47 @@ module.exports = {
                 }
             });
         });
-        await self.sendReply(interaction, `Docker Creator`, `Docker Configuration completed`, defered = 1);
+
+        let updateInfo = await new Promise((resolve) => {
+            query(`UPDATE \`minecraft-servers\` SET \`rconpassword\` = ? WHERE id = ?`, [dockerConfig.rconpassword, dockerConfig.serverid], async (error, results, fields) => {
+                if (error) {
+                    console.error(error);
+                    resolve(null);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+
+        if (!serverID && !updateInfo) {
+            return {code: 1, error: `Database error durring insert`}
+        }else{
+            return {code: 0, error: null}
+        }
+    },
+    generateDockerConfigBase: async (interaction, options, user, channel) => {
+        let serverid = options.serverid;
+        let containername = options.container;
+        let image = options.image;
+        let maxram = options.maxram;
+        let port = options.port;
+        let rconport = options.rconport;
+        let cpus = options.cpus;
+        let lram = options.maxram + 1;
+
+        let configBase = {
+            serverid: serverid,
+            image: image,
+            containername: containername,
+            mxram: maxram,
+            esport: port,
+            rport: rconport,
+            rconpassword: util.cookieGenerator.lettersAndNumbers({ lowercase: true, uppercase: true, quantity: 32 }),
+            cpus: cpus,
+            lram: lram
+        }
+
+        return configBase;
     },
     sendReply: async (interaction, title, message, defered = 0) => {
         let e = { title: title, description: message, color: util.color.accent };
