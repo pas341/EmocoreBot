@@ -115,7 +115,7 @@ exports.d = {
         }
 
         if (dockerConfig.platform==`CUSTOM`) {
-            let configdata = dockerConfig.configdata;
+            let configdata = JSON.parse(dockerConfig.configdata);
             if (!configdata) {
                 console.error(`Docker config: configdata is required to use server type custom`);
                 return {code: 4, error: `Docker config: configdata is required to use server type custom`};
@@ -126,7 +126,7 @@ exports.d = {
         }
 
         if (dockerConfig.configdata) {
-            let configdata = dockerConfig.configdata;
+            let configdata = JSON.parse(dockerConfig.configdata);
             if (configdata.extra_args) {
                 ENV.push(`EXTRA_ARGS=${configdata.extra_args}`);
             }
