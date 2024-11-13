@@ -145,7 +145,7 @@ module.exports = {
         let lram = options.maxram + 1;
 
         let cf_api_key = await new Promise((resolve) => {
-            query(`SELECT * FROM \`server-config\` WHERE \`serverid\` = ?`, [config.server.serverid], async (error, results, fields) => {
+            query(`SELECT * FROM \`server-config\` WHERE \`id\` = ?`, [config.server.serverid], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
