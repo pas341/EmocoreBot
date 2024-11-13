@@ -172,7 +172,7 @@ module.exports = {
         }
 
         let serverID = await new Promise((resolve) => {
-            query(`INSERT INTO \`minecraft-server-docker-config\``
+            query(`INSERT INTO \`minecraft-server-docker-config\` SET ?`
                 , [obj], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
