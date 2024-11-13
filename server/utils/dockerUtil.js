@@ -128,7 +128,7 @@ exports.d = {
             HostConfig: {
                 Binds: [`${serverConfigurationDB[`docker-container-base-location`]}/${dockerConfig.containername}:/data`,],
                 PortBindings: {
-                    "25577/tcp": [{
+                    "25575/tcp": [{
                         "HostIp": "",
                         "HostPort": ""+dockerConfig.rport
                     }],
