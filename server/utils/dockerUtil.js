@@ -114,26 +114,26 @@ exports.d = {
             ENV.push(`CF_FILE_ID=${cfconfig.file_id}`);
         }
 
+        let expPorts = {};
+        expPorts["25575/tcp"] = {};
+        expPorts["25565/tcp"] = {};
+
         let container = await docker.container.create({
             Image: dockerConfig.image,
-            ExposedPorts: {
-
-            },
             Tty: true,
             AttachStdin: true,
             AttachStdout: true,
             AttachStderr: true,
             name: dockerConfig.containername,
             Env: ENV,
+            ExposedPorts: expPorts,
             HostConfig: {
                 Binds: [`${serverConfigurationDB[`docker-container-base-location`]}/${dockerConfig.containername}:/data`,],
                 PortBindings: {
                     "25575/tcp": [{
-                        "HostIp": "",
                         "HostPort": ""+dockerConfig.rport
                     }],
                     "25565/tcp": [{
-                        "HostIp": "",
                         "HostPort": ""+dockerConfig.esport
                     }],
                 },
