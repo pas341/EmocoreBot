@@ -100,7 +100,6 @@ exports.d = {
         }
 
         let ENV = [`EULA=TRUE`];
-        console.log(dockerConfig);
         ENV.push(`MEMORY=${dockerConfig.mxram}G`);
         ENV.push(`MAX_MEMORY=${dockerConfig.mxram}G`);
 
