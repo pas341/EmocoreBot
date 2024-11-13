@@ -161,7 +161,7 @@ module.exports = {
             serverid: serverid,
             image: image,
             containername: containername,
-            maxram: maxram,
+            mxram: maxram,
             esport: port,
             rport: rconport,
             platform: `AUTO_CURSEFORGE`,
