@@ -165,7 +165,7 @@ module.exports = {
             esport: port,
             rport: rconport,
             platform: `AUTO_CURSEFORGE`,
-            curseforgeconfig: curseforge,
+            curseforgeconfig: JSON.stringify(curseforge),
             rconpassword: util.cookieGenerator.lettersAndNumbers({ lowercase: true, uppercase: true, quantity: 32 }),
             cpus: cpus,
             lram: lram
