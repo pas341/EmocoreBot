@@ -45,7 +45,7 @@ exports.connector = {
     },
     getServer: async (sinfo) => {
         let server = await new Promise((resolve) => {
-            query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ?`, [sinfo], async (error, results, fields) => {
+            query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ? ORDER BY \`name\``, [sinfo], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
@@ -56,7 +56,7 @@ exports.connector = {
         });
         if (!server) {
             server = await new Promise((resolve) => {
-                query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ?`, [sinfo], async (error, results, fields) => {
+                query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ? ORDER BY \`name\``, [sinfo], async (error, results, fields) => {
                     if (error) {
                         console.error(error);
                         resolve(null);
