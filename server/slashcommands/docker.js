@@ -133,7 +133,7 @@ module.exports = {
                 interaction.followUp({ ephemeral: true, embeds: [e] });
             }
         } else {
-            await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute raw commands on this server`);
+            await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute docker start commands on this server`, defered = 1);
             return;
         }
     },
