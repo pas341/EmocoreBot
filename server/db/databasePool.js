@@ -45,7 +45,7 @@ exports.query = {
     }
 };
 
-exports.con2 = {
+exports.debugConn = {
     init: function (s) {
         scripts = s;
         return new Promise((resolve, reject) => {
@@ -68,13 +68,13 @@ exports.con2 = {
         host: cred[`database_host`],
         user: cred[`database_user`],
         password: cred[`database_pass`],
-        database: cred[`database_schema2`],
+        database: cred[`database_schema_debug`],
     },
 };
 
 let pool2;
 
-exports.query2 = {
+exports.debugQuery = {
     bind: p => pool2 = p,
     execute: (statement, details, callback) => {
         if (details) {

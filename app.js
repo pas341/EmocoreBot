@@ -15,7 +15,8 @@ const remoteconfig = require(`${__dirname}/server/config/config.json`)[`remotes`
 
 const conn = require(`./server/db/databasePool.js`).conn;
 const query = require(`./server/db/databasePool.js`).query;
-
+const debugConn = require(`./server/db/databasePool.js`).debugConn;
+const debugQuery = require(`./server/db/databasePool.js`).debugQuery;
 
 const slashcommander = require(`./server/slashcommander.js`).slashcommander;
 const operator = require(`./server/operator.js`).operator;
@@ -26,6 +27,7 @@ const permissionUtil = require(`./server/utils/permissionUtil.js`).perms;
 const dockerUtil = require(`./server/utils/dockerUtil.js`).d;
 const settings = {
 	skipMemberFix: myArgs.includes("smf"),
+	testingDB: myArgs.includes("testing"),
 }
 
 const discord = {
@@ -75,12 +77,21 @@ const scripts = {
 
 const interactions = {
 	databaseConnect: async () => {
-		await new Promise(async (resolve) => conn.init(scripts).then((conn) => {
-			scripts.sql.conn = conn;
-			scripts.sql.query = query.bind(conn) && query.execute;
-			logger.info(`database connected at: ${util.prettyDate()}`);
-			resolve();
-		}));
+		if (settings.testingDB) {
+			await new Promise(async (resolve) => debugConn.init(scripts).then((debugConn) => {
+				scripts.sql.conn = debugConn;
+				scripts.sql.query = debugQuery.bind(debugConn) && debugQuery.execute;
+				logger.info(`testing database connected at: ${util.prettyDate()}`);
+				resolve();
+			}));
+		}else{
+			await new Promise(async (resolve) => conn.init(scripts).then((conn) => {
+				scripts.sql.conn = conn;
+				scripts.sql.query = query.bind(conn) && query.execute;
+				logger.info(`database connected at: ${util.prettyDate()}`);
+				resolve();
+			}));
+		}
 	},
 	discordClientLogin: async () => {
 		await new Promise(async (resolve) => discord.client.login(discord.token).then(resolve()));

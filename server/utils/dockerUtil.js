@@ -47,8 +47,6 @@ exports.d = {
             });
         });
 
-        console.log(serverConfigurationDB);
-        console.log(servername);
         let dbserver = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ?`, [servername], async (error, results, fields) => {
                 if (error) {
@@ -103,6 +101,15 @@ exports.d = {
         ENV.push(`MEMORY=${dockerConfig.mxram}G`);
         ENV.push(`MAX_MEMORY=${dockerConfig.mxram}G`);
 
+        if (dockerConfig.extraenv) {
+            let envData = JSON.parse(dockerConfig.extraenv);
+            for (let e of envData) {
+                let key = e.key;
+                let value = e.value;
+                ENV.push(`${key}=${value}`);
+            }
+        }
+
         if (dockerConfig.rconpassword) {
             ENV.push(`RCON_PASSWORD=${dockerConfig.rconpassword}`);
         }
@@ -122,7 +129,28 @@ exports.d = {
             }
             ENV.push(`TYPE=CUSTOM`);
             ENV.push(`CUSTOM_SERVER=${configdata.custom_server}`);
-            
+        }
+
+        if (dockerConfig.platform==`FORGE`) {
+            let configdata = JSON.parse(dockerConfig.configdata);
+            if (!configdata) {
+                console.error(`Docker config: configdata is required to use server type custom`);
+                return {code: 4, error: `Docker config: configdata is required to use server type custom`};
+            }
+            ENV.push(`TYPE=FORGE`);
+            ENV.push(`VERSION=${dbserver.mcversion}`);
+            ENV.push(`FORGE_VERSION=${configdata.forgeversion}`);
+        }
+
+        if (dockerConfig.platform==`NEOFORGE`) {
+            let configdata = JSON.parse(dockerConfig.configdata);
+            if (!configdata) {
+                console.error(`Docker config: configdata is required to use server type custom`);
+                return {code: 4, error: `Docker config: configdata is required to use server type custom`};
+            }
+            ENV.push(`TYPE=NEOFORGE`);
+            ENV.push(`VERSION=${dbserver.mcversion}`);
+            ENV.push(`NEOFORGE_VERSION=${configdata.neoforgeversion}`);
         }
 
         if (dockerConfig.configdata) {
