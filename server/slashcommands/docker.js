@@ -102,7 +102,7 @@ module.exports = {
                 return;
             }
 
-            let start_event = await docker.createContainer(null, options.server);
+            let start_event = await docker.createContainer(serverinfo.dockerConfig.containername, serverinfo.id);
             if (start_event.code != 0) {
                 console.error(`Docker container failed to start errorcode: ${start_event.code}`);
                 if (serverinfo.iconurl) {
@@ -128,7 +128,7 @@ module.exports = {
                 await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `docker container name is not set in DB!`, defered = 1);
                 return;
             }
-            let container = await docker.getContainer(serverinfo.dockerConfig.containername, options.server);
+            let container = await docker.getContainer(serverinfo.dockerConfig.containername, serverinfo.id);
             if (!container) {
                 await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`, defered = 1);
                 return;
@@ -152,7 +152,7 @@ module.exports = {
                 return;
             }
 
-            let container = await docker.getContainer(serverinfo.dockerConfig.containername);
+            let container = await docker.getContainer(serverinfo.dockerConfig.containername, serverinfo.id);
             if (!container) {
                 await self.sendErrorReply(interaction, `Invalid Server Configuration`, title = `Unable to find docker container on server`, defered = 1);
                 return;

@@ -51,6 +51,7 @@ exports.d = {
                 }
             });
         });
+
         console.log(config.server.servertoken);
         let dbserver = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ? AND \`servertoken\` = ?`, [servername, config.server.servertoken], async (error, results, fields) => {
