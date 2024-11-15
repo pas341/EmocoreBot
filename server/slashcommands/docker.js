@@ -16,7 +16,7 @@ module.exports = {
                     description: `What is the name of the server you want to start`,
                     type: 3,
                     required: true,
-                    choices: null
+                    autocomplete: true
                 }
             ],
             default_member_permissions: 1,
@@ -31,7 +31,7 @@ module.exports = {
                     description: `What is the name of the server you want to stop`,
                     type: 3,
                     required: true,
-                    choices: null
+                    autocomplete: true
                 }
             ],
             default_member_permissions: 1,
@@ -46,7 +46,7 @@ module.exports = {
                     description: `What is the name of the server you want to restart`,
                     type: 3,
                     required: true,
-                    choices: null
+                    autocomplete: true
                 }
             ],
             default_member_permissions: 1,
@@ -64,23 +64,6 @@ module.exports = {
         util = scripts.util;
         logger = scripts.logger;
         self = this;
-
-        for (let option of this.options) {
-            for (let o of option.options) {
-                if (o.name == `server`) {
-                    o.choices = await this.getServers();
-                }
-            }
-        }
-    },
-    getServers: async () => {
-        let options = [];
-        let servers = await msc.getServerInfo();
-        for (let i of servers) {
-            let obj = { name: i.name, value: ""+i.id };
-            options.push(obj);
-        }
-        return options;
     },
     execute: async (interaction, options, user, gameid, guild) => {
         try {
@@ -201,5 +184,20 @@ module.exports = {
         } else {
             await interaction.reply({ embeds: [e], ephemeral: true });
         }
+    },
+    autocomplete: async (interaction, options, field, user) => {
+        let suggestions = [];
+        if (field.name==`server`) {
+            let servers = await msc.getServerInfo();
+            if (servers) {
+                for (let i of servers) {
+                    if (i.name.toLowerCase().startsWith(field.value.toLowerCase())) {
+                        let obj = {name: i.name, value: i.name};
+                        suggestions.push(obj);
+                    }
+                }
+            }
+        }
+        interaction.respond(suggestions);
     },
 };

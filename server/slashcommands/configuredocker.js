@@ -461,7 +461,7 @@ module.exports = {
         let cfslug = options.cfslug; // Curseforge only
         let fileid = options.fileid; // Curseforge only
         let cf_api_key = await new Promise((resolve) => {
-            query(`SELECT * FROM \`server-config\` WHERE \`id\` = ?`, [config.server.serverid], async (error, results, fields) => {
+            query(`SELECT * FROM \`servers\` WHERE \`token\` = ?`, [config.server.servertoken], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
@@ -589,5 +589,21 @@ module.exports = {
         } else {
             await interaction.reply({ embeds: [e], ephemeral: true });
         }
+    },
+    autocomplete: async (interaction, options, field, user) => {
+        let suggestions = [];
+        console.log(field);
+        if (field.name==`server`) {
+            let servers = await msc.getServerInfo();
+            if (servers) {
+                for (let i of servers) {
+                    if (i.name.toLowerCase().startsWith(field.value.toLowerCase())) {
+                        let obj = {name: i.name, value: i.name};
+                        suggestions.push(obj);
+                    }
+                }
+            }
+        }
+        interaction.respond(suggestions);
     },
 };

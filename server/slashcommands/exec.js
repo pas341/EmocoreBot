@@ -13,7 +13,7 @@ module.exports = {
             description: `Target Server`,
             type: 3,
             required: true,
-            choices: null
+            autocomplete: true
         },
         {
             name: `command`,
@@ -33,20 +33,6 @@ module.exports = {
         util = scripts.util;
         logger = scripts.logger;
         self = this;
-        for (let option of this.options) {
-            if (option.name == `server`) {
-                option.choices = await this.getServers();
-            }
-        }
-    },
-    getServers: async () => {
-        let options = [];
-        let servers = await msc.getServerInfo();
-        for (let i of servers) {
-            let obj = {name: i.name, value: i.name};
-            options.push(obj);
-        }
-        return options;
     },
     execute: async (interaction, options, user, gameid, guild) => {
         try {
@@ -87,4 +73,19 @@ module.exports = {
 			await interaction.reply({ embeds: [e], ephemeral: true });
 		}
 	},
+    autocomplete: async (interaction, options, field, user) => {
+        let suggestions = [];
+        if (field.name==`server`) {
+            let servers = await msc.getServerInfo();
+            if (servers) {
+                for (let i of servers) {
+                    if (i.name.toLowerCase().startsWith(field.value.toLowerCase())) {
+                        let obj = {name: i.name, value: i.name};
+                        suggestions.push(obj);
+                    }
+                }
+            }
+        }
+        interaction.respond(suggestions);
+    }
 };

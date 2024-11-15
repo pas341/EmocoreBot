@@ -67,21 +67,12 @@ module.exports = {
         for (let option of this.options) {
             for (let o of option.options) {
                 if (o.name == `image`) {
-                    o.choices = await this.getServers();
+                    o.choices = await this.getImages();
                 }
             }
         }
     },
-    getServers: async () => {
-        let options = [];
-        let servers = await msc.getServerInfo();
-        for (let i of servers) {
-            let obj = { name: i.name, value: "" + i.id };
-            options.push(obj);
-        }
-        return options;
-    },
-    getServers: async () => {
+    getImages: async () => {
         let options = [];
         let images = await new Promise((resolve) => {
             query(`SELECT * FROM \`docker-images\``, [], async (error, results, fields) => {
@@ -173,5 +164,21 @@ module.exports = {
         } else {
             await interaction.reply({ embeds: [e], ephemeral: true });
         }
+    },
+    autocomplete: async (interaction, options, field, user) => {
+        let suggestions = [];
+        console.log(field);
+        if (field.name==`server`) {
+            let servers = await msc.getServerInfo();
+            if (servers) {
+                for (let i of servers) {
+                    if (i.name.toLowerCase().startsWith(field.value.toLowerCase())) {
+                        let obj = {name: i.name, value: i.name};
+                        suggestions.push(obj);
+                    }
+                }
+            }
+        }
+        interaction.respond(suggestions);
     },
 };

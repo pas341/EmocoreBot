@@ -1,6 +1,6 @@
 const { Rcon } = require("rcon-client");
 
-var client, guild, query, util, self, logger;
+var client, guild, query, util, config, self, logger;
 
 
 exports.connector = {
@@ -10,11 +10,25 @@ exports.connector = {
         query = scripts.sql.query;
         util = scripts.util;
         logger = scripts.logger;
+        config = scripts.config;
         self = this.connector;
     },
-    getServerInfo: async () => {
+    getServerInfo: async (options) => {
+        console.log(options);
+        if (!options) {
+            options = {selector: `local`};
+        }
+        let selectSTMT = ``;
+        if (options.selector == `local`) {
+            selectSTMT = `SELECT * FROM \`minecraft-servers\` WHERE \`servertoken\` = ? ORDER BY \`extport\``;
+        }else if (options.selector == `all`) {
+            selectSTMT = `SELECT * FROM \`minecraft-servers\` ORDER BY \`extport\``;
+        }
+
+        console.log(options);
+
         let servers = await new Promise((resolve) => {
-            query(`SELECT * FROM \`minecraft-servers\` ORDER BY \`extport\``, [], async (error, results, fields) => {
+            query(selectSTMT, [config.server.servertoken], async (error, results, fields) => {
                 if (error) {
                     logger.error(error);
                     resolve(null);
@@ -24,20 +38,22 @@ exports.connector = {
             });
         });
 
-        for (let s of servers) {
-            let dockerinfo = await new Promise((resolve) => {
-                query(`SELECT * FROM \`minecraft-server-docker-config\` WHERE \`serverid\` = ?`, [s.id], async (error, results, fields) => {
-                    if (error) {
-                        logger.error(error);
-                        resolve(null);
-                    } else {
-                        resolve(results.length ? results[0] : null);
-                    }
+        if (servers) {
+            for (let s of servers) {
+                let dockerinfo = await new Promise((resolve) => {
+                    query(`SELECT * FROM \`minecraft-server-docker-config\` WHERE \`serverid\` = ?`, [s.id], async (error, results, fields) => {
+                        if (error) {
+                            logger.error(error);
+                            resolve(null);
+                        } else {
+                            resolve(results.length ? results[0] : null);
+                        }
+                    });
                 });
-            });
-
-            if (dockerinfo) {
-                s.dockerConfig = dockerinfo;
+                
+                if (dockerinfo) {
+                    s.dockerConfig = dockerinfo;
+                }
             }
         }
 

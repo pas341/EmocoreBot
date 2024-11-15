@@ -83,4 +83,20 @@ module.exports = {
 			await interaction.reply({ embeds: [e], ephemeral: true });
 		}
 	},
+    autocomplete: async (interaction, options, field, user) => {
+        let suggestions = [];
+        console.log(field);
+        if (field.name==`server`) {
+            let servers = await msc.getServerInfo();
+            if (servers) {
+                for (let i of servers) {
+                    if (i.name.toLowerCase().startsWith(field.value.toLowerCase())) {
+                        let obj = {name: i.name, value: i.name};
+                        suggestions.push(obj);
+                    }
+                }
+            }
+        }
+        interaction.respond(suggestions);
+    },
 };

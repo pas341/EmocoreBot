@@ -17,6 +17,11 @@ exports.e = {
 		let channelGameId = -1;
 
 		if(interaction.isAutocomplete()){
+			if (interaction.commandName) {
+				let command = client.commands.get(interaction.commandName);
+				await command.autocomplete(interaction, interaction.options, interaction.options.getFocused(true), user);
+				return;
+			}
 			let field = interaction.options.getFocused(true);
 			let options = interaction.options;
 			let optionsData = options && options.data;

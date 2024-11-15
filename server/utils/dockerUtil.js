@@ -42,7 +42,7 @@ exports.d = {
     },
     createContainer: async (servername, mcServerID) => {
         let serverConfigurationDB = await new Promise((resolve) => {
-            query(`SELECT * FROM \`server-config\` WHERE \`id\` = ?`, [config.server.serverid], async (error, results, fields) => {
+            query(`SELECT * FROM \`servers\` WHERE \`token\` = ?`, [config.server.servertoken], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
@@ -53,7 +53,7 @@ exports.d = {
         });
 
         let dbserver = await new Promise((resolve) => {
-            query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ?`, [servername], async (error, results, fields) => {
+            query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ? AND \`\``, [servername], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
