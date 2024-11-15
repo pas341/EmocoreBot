@@ -53,7 +53,7 @@ exports.d = {
         });
 
         let dbserver = await new Promise((resolve) => {
-            query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ? AND \`\``, [servername], async (error, results, fields) => {
+            query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ? AND \`servertoken\` = ?`, [servername, config.server.servertoken], async (error, results, fields) => {
                 if (error) {
                     console.error(error);
                     resolve(null);
@@ -65,7 +65,7 @@ exports.d = {
 
         if (!dbserver && mcServerID != null) {
             dbserver = await new Promise((resolve) => {
-                query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ?`, [mcServerID], async (error, results, fields) => {
+                query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ? AND \`servertoken\` = ?`, [mcServerID, config.server.servertoken], async (error, results, fields) => {
                     if (error) {
                         console.error(error);
                         resolve(null);
