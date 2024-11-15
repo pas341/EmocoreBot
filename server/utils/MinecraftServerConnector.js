@@ -14,7 +14,6 @@ exports.connector = {
         self = this.connector;
     },
     getServerInfo: async (options) => {
-        console.log(options);
         if (!options) {
             options = {selector: `local`};
         }
@@ -24,8 +23,6 @@ exports.connector = {
         }else if (options.selector == `all`) {
             selectSTMT = `SELECT * FROM \`minecraft-servers\` ORDER BY \`extport\``;
         }
-
-        console.log(options);
 
         let servers = await new Promise((resolve) => {
             query(selectSTMT, [config.server.servertoken], async (error, results, fields) => {
