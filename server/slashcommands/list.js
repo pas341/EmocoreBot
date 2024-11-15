@@ -32,6 +32,10 @@ module.exports = {
         try {
             if (await perms.hasPermission(user, `list`, options.server)) {
                 let connection = await msc.connect(await msc.getServer(servername = options.server));
+                if (!connection) {
+                    await self.sendFaultReply(interaction, `Server not avalible`, `Unable to connect to rcon on the server.\nThis might be due to missing server name.\nOr that the rcon port is not open`);
+                    return;
+                }
                 let response = await connection.send(`list`);
                 let e = { title: `Online Players`, description: response, color: util.color.accent};
                 interaction.reply({ ephemeral: true, embeds: [e] });
