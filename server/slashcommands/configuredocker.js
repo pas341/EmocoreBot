@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc, docker, perms, config;
+var client, guild, query, util, self, msc, docker, logger, perms, config;
 
 module.exports = {
     name: `configuredocker`,
@@ -300,6 +300,7 @@ module.exports = {
         query = scripts.sql.query;
         util = scripts.util;
         config = scripts.config;
+        logger = scripts.logger;
         self = this;
 
         for (let option of this.options) {
@@ -315,7 +316,7 @@ module.exports = {
         let images = await new Promise((resolve) => {
             query(`SELECT * FROM \`docker-images\``, [], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results : null);
@@ -356,7 +357,7 @@ module.exports = {
             }
 
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             await self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`, defered = 1);
         }
     },
@@ -378,7 +379,7 @@ module.exports = {
             configdata.jvm_options = options.jvm_options;
         }
 
-        dockerConfig.platform = `FORGE`;
+        dockerConfig.platform = `NEOFORGE`;
         dockerConfig.configdata = JSON.stringify(configdata);
 
         let insertData = await self.insertDockerConfigInDB(interaction, options, user, channel, dockerConfig);
@@ -497,7 +498,7 @@ module.exports = {
         let dbserver = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ?`, [id], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results[0] : null);
@@ -512,7 +513,7 @@ module.exports = {
             query(`INSERT INTO \`minecraft-server-docker-config\` SET ?`
                 , [dockerConfig], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
 
@@ -524,7 +525,7 @@ module.exports = {
         let updateInfo = await new Promise((resolve) => {
             query(`UPDATE \`minecraft-servers\` SET \`rconpassword\` = ?, \`extport\` = ?, \`rconport\` = ? WHERE id = ?`, [dockerConfig.rconpassword, dockerConfig.esport, dockerConfig.rport, dockerConfig.serverid], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results);

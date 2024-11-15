@@ -1,4 +1,4 @@
-var client, guild, query, util, self;
+var client, guild, query, util, self, logger;
 
 module.exports = {
     name: `register`,
@@ -20,6 +20,7 @@ module.exports = {
         guild = client.guilds.cache.find(g => g.name === scripts.guildname);
         query = scripts.sql.query;
         util = scripts.util;
+        logger = scripts.logger;
         self = this;
     },
     execute: async (interaction, options, user, gameid, guild) => {
@@ -30,7 +31,7 @@ module.exports = {
             let insert = await new Promise((resolve) => {
                 query(`INSERT INTO \`discord-minecraft-accounts\` (\`mname\`, \`dname\`, \`muid\`, \`duid\`, \`admin\`) VALUES (?, ?, ?, ?, ?)`, [username, user.username, mojangUserData.id, user.id, 0], async (error, results, fields) => {
                     if (error) {
-                        console.error(error);
+                        logger.error(error);
                         resolve(0);
                     } else {
                         resolve(1);
@@ -46,7 +47,7 @@ module.exports = {
             }
 
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`);
         }
     },

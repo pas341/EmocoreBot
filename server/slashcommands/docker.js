@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc, docker, perms;
+var client, guild, query, util, self, msc, logger, docker, perms;
 
 module.exports = {
     name: `docker`,
@@ -62,6 +62,7 @@ module.exports = {
         perms = scripts.utils.permissionUtil;
         query = scripts.sql.query;
         util = scripts.util;
+        logger = scripts.logger;
         self = this;
 
         for (let option of this.options) {
@@ -106,7 +107,7 @@ module.exports = {
             }
 
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             await self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`, defered = 1);
         }
     },

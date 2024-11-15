@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc, docker, perms;
+var client, guild, query, util, self, msc, logger, docker, perms;
 
 module.exports = {
     name: `createserver`,
@@ -61,6 +61,7 @@ module.exports = {
         perms = scripts.utils.permissionUtil;
         query = scripts.sql.query;
         util = scripts.util;
+        logger = scripts.logger;
         self = this;
 
         for (let option of this.options) {
@@ -85,7 +86,7 @@ module.exports = {
         let images = await new Promise((resolve) => {
             query(`SELECT * FROM \`docker-images\``, [], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results[0] : null);
@@ -117,7 +118,7 @@ module.exports = {
             }
 
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             await self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`, defered = 1);
         }
     },
@@ -136,7 +137,7 @@ module.exports = {
             query(`INSERT INTO \`minecraft-servers\` (\`name\`, \`iconurl\`, \`modpackurl\`, \`modpackversion\`, \`mcversion\`, \`discordchannel\`, \`discordcat\`, \`domain\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
                 , [name, iconurl, modpackurl, modpackversion, minecraftversion, disocordChannelId, channelCategoryId, domain], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
 

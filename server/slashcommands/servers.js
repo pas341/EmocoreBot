@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc, docker;
+var client, guild, query, util, self, msc, docker, logger;
 
 module.exports = {
     name: `servers`,
@@ -16,6 +16,7 @@ module.exports = {
         util = scripts.util;
         msc = scripts.utils.minecraftServerConnector;
         docker = scripts.utils.docker;
+        logger = scripts.logger;
         self = this;
     },
     execute: async (interaction, options, user, gameid, guild) => {
@@ -26,7 +27,6 @@ module.exports = {
             let embeds = [];
 
             for (let i of servers) {
-                console.log(i);
                 let e = {title: i.name};
                 let desc = ``;
                 let serverPort = i.dockerConfig ? i.dockerConfig.esport : i.extport;

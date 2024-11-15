@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc, perms;
+var client, guild, query, util, self, logger, msc, perms;
 
 
 
@@ -25,6 +25,7 @@ module.exports = {
         perms = scripts.utils.permissionUtil;
         query = scripts.sql.query;
         util = scripts.util;
+        logger = scripts.logger;
         self = this;
         for (let option of this.options) {
             if (option.name == `server`) {

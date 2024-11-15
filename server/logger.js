@@ -4,7 +4,7 @@ const config = {
     appname: "DEFAULT APP NAME",
     appnameset: 0,
     debug: 1,
-    startup: 0,
+    startup: 1,
     info: 1
 }
 

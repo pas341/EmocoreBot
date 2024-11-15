@@ -1,6 +1,6 @@
 const { Rcon } = require("rcon-client");
 
-var client, guild, query, util, self;
+var client, guild, query, util, self, logger;
 
 
 exports.connector = {
@@ -9,13 +9,14 @@ exports.connector = {
         guild = client.guilds.cache.find(g => g.name === scripts.guildname);
         query = scripts.sql.query;
         util = scripts.util;
+        logger = scripts.logger;
         self = this.connector;
     },
     getServerInfo: async () => {
         let servers = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-servers\` ORDER BY \`extport\``, [], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results : null);
@@ -27,7 +28,7 @@ exports.connector = {
             let dockerinfo = await new Promise((resolve) => {
                 query(`SELECT * FROM \`minecraft-server-docker-config\` WHERE \`serverid\` = ?`, [s.id], async (error, results, fields) => {
                     if (error) {
-                        console.error(error);
+                        logger.error(error);
                         resolve(null);
                     } else {
                         resolve(results.length ? results[0] : null);
@@ -46,7 +47,7 @@ exports.connector = {
         let server = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ?`, [sinfo], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results[0] : null);
@@ -57,7 +58,7 @@ exports.connector = {
             server = await new Promise((resolve) => {
                 query(`SELECT * FROM \`minecraft-servers\` WHERE \`name\` = ?`, [sinfo], async (error, results, fields) => {
                     if (error) {
-                        console.error(error);
+                        logger.error(error);
                         resolve(null);
                     } else {
                         resolve(results.length ? results[0] : null);
@@ -70,7 +71,7 @@ exports.connector = {
             let dockerinfo = await new Promise((resolve) => {
                 query(`SELECT * FROM \`minecraft-server-docker-config\` WHERE \`serverid\` = ?`, [server.id], async (error, results, fields) => {
                     if (error) {
-                        console.error(error);
+                        logger.error(error);
                         resolve(null);
                     } else {
                         resolve(results.length ? results[0] : null);
@@ -88,7 +89,7 @@ exports.connector = {
         let server = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-servers\` WHERE \`discordcat\` = ?`, [categoryId], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results[0] : null);
@@ -100,8 +101,8 @@ exports.connector = {
     },
     connect: async (serverinfo) => {
         if (serverinfo == null) {
-            console.error(`Invalid ServerInfo`);
-            console.error(serverinfo);
+            logger.error(`Invalid ServerInfo`);
+            logger.error(serverinfo);
             return;
         }
 
@@ -109,9 +110,13 @@ exports.connector = {
         let rconpassword = serverinfo.dockerConfig ? serverinfo.dockerConfig.rconpassword : serverinfo.rconpassword;
         let address = serverinfo.domain;
 
-
-        let connection = await Rcon.connect({ host: address, port: rconport, password: rconpassword });
-        return connection;
+        try {
+            let connection = await Rcon.connect({ host: address, port: rconport, password: rconpassword });
+            return connection;
+        }catch (e) {
+            logger.error(`[minecraftServerConnector.js] : [connect()] Server connection is not avalible for this server: ${serverinfo.name}:${serverinfo.id}`);
+            return null;
+        }
     },
     whitelist_on: async (connection) => {
         return await self.exec(connection, `whitelist on`);
@@ -143,7 +148,7 @@ exports.connector = {
             let dbuser = await new Promise((resolve) => {
                 query(`SELECT * FROM \`discord-minecraft-accounts\` WHERE \`duid\` = ?`, [user.id], async (error, results, fields) => {
                     if (error) {
-                        console.error(error);
+                        logger.error(error);
                         resolve(null);
                     } else {
                         resolve(results.length ? results[0] : null);
@@ -164,7 +169,7 @@ exports.connector = {
             let dbuser = await new Promise((resolve) => {
                 query(`SELECT * FROM \`discord-minecraft-accounts\` WHERE \`duid\` = ?`, [user.id], async (error, results, fields) => {
                     if (error) {
-                        console.error(error);
+                        logger.error(error);
                         resolve(null);
                     } else {
                         resolve(results.length ? results[0] : null);

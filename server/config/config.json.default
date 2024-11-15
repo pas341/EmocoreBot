@@ -11,6 +11,7 @@
     "database_pass": ""
   },
   "server": {
-    "serverid": -1
+    "serverid": -1,
+    "servertoken": ""
   }
 }

@@ -1,4 +1,4 @@
-var client, guild, query, util, self, msc, perms;
+var client, guild, query, util, self, logger, msc, perms;
 
 
 
@@ -32,6 +32,7 @@ module.exports = {
         perms = scripts.utils.permissionUtil;
         query = scripts.sql.query;
         util = scripts.util;
+        logger = scripts.logger;
         self = this;
         for (let option of this.options) {
             if (option.name == `server`) {
@@ -58,7 +59,7 @@ module.exports = {
             if (await perms.hasPermission(user, `op`, options.server)) {
                 let connection = await msc.connect(await msc.getServer(servername = options.server));
                 let target = options.target ? options.target : (await util.getDBUserByDiscordUser(query, user)).mname;
-                console.log(target);
+                console.logger(target);
                 if (target != (await util.getDBUserByDiscordUser(query, user)).mname) {
                     if (!await perms.hasPermission(user, `deop.others`, options.server)) {
                         await self.sendFaultReply(interaction, `Permission Issue`, `You do not have permisssion to execute this commands on others on this server`);
@@ -75,7 +76,7 @@ module.exports = {
             }
 
         } catch (e) {
-            console.error(e);
+            console.logger(e);
             self.sendErrorReply(interaction, `An internal error occured please contact <@228573762864283649>`);
         }
     },

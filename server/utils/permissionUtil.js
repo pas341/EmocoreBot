@@ -1,4 +1,4 @@
-var client, guild, query, util, self, perms, permsByKey;
+var client, guild, query, util, self, logger, perms, permsByKey;
 
 exports.perms = {
     init: async (c, scripts) => {
@@ -6,6 +6,7 @@ exports.perms = {
         guild = client.guilds.cache.find(g => g.name === scripts.guildname);
         query = scripts.sql.query;
         util = scripts.util;
+        logger = scripts.logger;
         self = this;
         perms = await self.perms.fetchPerms();
     },
@@ -32,9 +33,9 @@ exports.perms = {
         // return 0 if permission is not found for user or if there is a problem finding it
         // returns 1 if permission is granted to user for server or permission is defaulted to 1
         if (debug) {
-            console.log(`User: ${user.username}`);
-            console.log(`Perm: ${perm}`);
-            console.log(`Server: ${server}`);
+            logger.debug(`User: ${user.username}`);
+            logger.debug(`Perm: ${perm}`);
+            logger.debug(`Server: ${server}`);
         }
 
         let found = 0;
@@ -66,7 +67,7 @@ exports.perms = {
             dbserver = await new Promise((resolve) => {
                 query(`SELECT * FROM \`minecraft-servers\` WHERE \`id\` = ?`, [server], async (error, results, fields) => {
                     if (error) {
-                        console.error(error);
+                        logger.error(error);
                         resolve(null);
                     } else {
                         resolve(results.length ? results[0] : null);
@@ -76,14 +77,14 @@ exports.perms = {
         }
 
         if (!dbserver) {
-            console.error(`Server not found! server: ${server}`);
+            logger.error(`Server not found! server: ${server}`);
             return 0;
         }
 
         let dbuser = await new Promise((resolve) => {
             query(`SELECT * FROM \`discord-minecraft-accounts\` WHERE \`duid\` = ?`, [user.id], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results[0] : null);
@@ -103,7 +104,7 @@ exports.perms = {
         let userperm = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-server-permissions\` WHERE \`serverid\` = ? AND \`duid\` = ? AND \`permissonid\``, [dbserver.id, dbuser.id, p.id], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results[0] : null);
@@ -114,7 +115,7 @@ exports.perms = {
         let permissiongroups = await new Promise((resolve) => {
             query(`SELECT * FROM \`minecraft-server-permission-groups\` WHERE \`serverid\` = ? AND \`playerid\` = ?`, [dbserver.id, dbuser.id], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results : null);
@@ -127,7 +128,7 @@ exports.perms = {
         let pgroupsDB = await new Promise((resolve) => {
             query(`SELECT * FROM \`permission-groups\``, [], async (error, results, fields) => {
                 if (error) {
-                    console.error(error);
+                    logger.error(error);
                     resolve(null);
                 } else {
                     resolve(results.length ? results : null);

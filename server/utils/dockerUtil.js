@@ -1,4 +1,4 @@
-var client, guild, query, util, self, docker, config;
+var client, guild, query, util, self, docker, config, logger;
 const { Docker } = require('node-docker-api');
 const { Volume } = require('node-docker-api/lib/volume');
 
@@ -10,6 +10,7 @@ exports.d = {
         util = scripts.util;
         config = scripts.config;
         self = this.d;
+        logger = scripts.logger;
 
         docker = new Docker();
     },
@@ -18,22 +19,26 @@ exports.d = {
         return containers;
     },
     getContainer: async (containername) => {
-        console.log(`Container: ${containername} requested!`);
-        let containers = await docker.container.list({all: true});
-        for (let c of containers) {
-            if (c.data.Labels[`com.docker.compose.service`] == containername) {
-                return c;
-            }
-
-            for (let name of c.data.Names) {
-                console.log(`Container: ${name} : match: ${containername}`);
-                if (name.includes(containername)) {
+        try {
+            let containers = await docker.container.list({all: true});
+            for (let c of containers) {
+                if (c.data.Labels[`com.docker.compose.service`] == containername) {
                     return c;
                 }
+    
+                for (let name of c.data.Names) {
+                    if (name.includes(containername)) {
+                        return c;
+                    }
+                }
             }
+            logger.error(`[dockerUtil.js] : [getContainer()] Docker Container not found!`);
+            return null;
+        }catch (e) {
+            logger.error(`[dockerUtil.js] : [getContainer()] Docker is not avalible on the server`);
+            return null;
         }
-        console.error(`Docker Container not found!`);
-        return null;
+        
     },
     createContainer: async (servername, mcServerID) => {
         let serverConfigurationDB = await new Promise((resolve) => {
@@ -72,7 +77,8 @@ exports.d = {
         }
 
         if (!dbserver) {
-            console.error(`Server not found in DB`);
+            //error info servername and mcServerID should not both be set so it is normal to see that one is null
+            logger.error(`[dockerUtil.js] : [createContainer()] Server not found in DB: ${servername}:${mcServerID} [servername:serverid]`);
             return {code: 2, error: `Server not found in database`};
         }
 
@@ -87,15 +93,17 @@ exports.d = {
             });
         });
 
+
+        if (!dockerConfig) {
+            logger.error(`[dockerUtil.js] : [createContainer()] Docker config not found in DB`);
+            return {code: 3, error: `Docker config not found`};
+        }
+
         if (await self.getContainer(dockerConfig.containername)) {
-            console.error(`There is all ready a container running with this name`);
+            logger.error(`[dockerUtil.js] : [createContainer()] There is all ready a container running with this name: (${dockerConfig.containername})`);
             return {code: 1, error: `Container is all ready running`};
         }
 
-        if (!dockerConfig) {
-            console.error(`Docker config not found in DB`);
-            return {code: 3, error: `Docker config not found`};
-        }
 
         let ENV = [`EULA=TRUE`];
         ENV.push(`MEMORY=${dockerConfig.mxram}G`);
@@ -124,7 +132,7 @@ exports.d = {
         if (dockerConfig.platform==`CUSTOM`) {
             let configdata = JSON.parse(dockerConfig.configdata);
             if (!configdata) {
-                console.error(`Docker config: configdata is required to use server type custom`);
+                logger.error(`Docker config: configdata is required to use server type custom`);
                 return {code: 4, error: `Docker config: configdata is required to use server type custom`};
             }
             ENV.push(`TYPE=CUSTOM`);
@@ -134,7 +142,7 @@ exports.d = {
         if (dockerConfig.platform==`FORGE`) {
             let configdata = JSON.parse(dockerConfig.configdata);
             if (!configdata) {
-                console.error(`Docker config: configdata is required to use server type custom`);
+                logger.error(`Docker config: configdata is required to use server type custom`);
                 return {code: 4, error: `Docker config: configdata is required to use server type custom`};
             }
             ENV.push(`TYPE=FORGE`);
@@ -145,7 +153,7 @@ exports.d = {
         if (dockerConfig.platform==`NEOFORGE`) {
             let configdata = JSON.parse(dockerConfig.configdata);
             if (!configdata) {
-                console.error(`Docker config: configdata is required to use server type custom`);
+                logger.error(`Docker config: configdata is required to use server type custom`);
                 return {code: 4, error: `Docker config: configdata is required to use server type custom`};
             }
             ENV.push(`TYPE=NEOFORGE`);

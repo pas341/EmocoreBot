@@ -22,7 +22,7 @@ const slashcommander = require(`./server/slashcommander.js`).slashcommander;
 const operator = require(`./server/operator.js`).operator;
 const myArgs = process.argv.slice(2);
 
-const msc = require(`./server/utils/MinecraftServerConnector.js`).connector;
+const msc = require(`./server/utils/minecraftServerConnector.js`).connector;
 const permissionUtil = require(`./server/utils/permissionUtil.js`).perms;
 const dockerUtil = require(`./server/utils/dockerUtil.js`).d;
 const settings = {
