@@ -102,7 +102,7 @@ module.exports = {
                 return;
             }
 
-            let start_event = await docker.createContainer(serverinfo.dockerConfig.containername, options.server);
+            let start_event = await docker.createContainer(null, options.server);
             if (start_event.code != 0) {
                 console.error(`Docker container failed to start errorcode: ${start_event.code}`);
                 if (serverinfo.iconurl) {
